@@ -67,23 +67,40 @@ public class Repair extends DeriusAbility implements Ability
 	public Object onActivate(DPlayer dplayer, Object other)
 	{
 		// NULL check
-		if ( ! dplayer.isPlayer()) return Optional.empty();
+		if ( ! dplayer.isPlayer()) return null;
 		ItemStack inHand = dplayer.getPlayer().getItemInHand();
-		Validate.notNull(inHand, "The improvable Item may not be null.");
+		if (inHand == null) return null;
 		
-		int durabilityLeft = ItemUtil.durabilityLeft(inHand);
+		// -------------------------------------------- //
+		// Preparation and checks
+		// -------------------------------------------- //
 		
 		// How broken is the tool?
+		int durabilityLeft = ItemUtil.durabilityLeft(inHand);
+		
+
+		// Was the tool repaired before? (Mstore Coll?)
+		//	if so, how many repair scars does it have?
+		//	does it exceed the maximum repair scars per item?
+		
 		// What Material class (iron, gold, ect) is the tool?
+		//	Thus, what material is used to repair it (configurable)?
+		//	How many repair Materials in inventory? Atleast one?
 		
-		// How many repair Materials in inventory?
-		// 	How much can be repaired with that?
+		// Is Player able to repair this Itemclass?
 		
-		// Chance that comes from levels
-		
-		
-		
+		// -------------------------------------------- //
 		// Repair
+		// -------------------------------------------- //
+		
+		// How much can be repaired with the amount of materials?
+		
+		// How many scars are applied to the item?
+		// How much durability is being restored?
+		
+		// Send a Message, that the repair was succesfull (Actionbar?)
+		// Make a shiny particle or so on the Player.
+		
 		
 		return null;
 	}

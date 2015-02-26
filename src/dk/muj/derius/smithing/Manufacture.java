@@ -1,7 +1,5 @@
 package dk.muj.derius.smithing;
 
-import java.util.Optional;
-
 import dk.muj.derius.api.Ability;
 import dk.muj.derius.api.DPlayer;
 import dk.muj.derius.api.Skill;
@@ -63,7 +61,8 @@ public class Manufacture extends DeriusAbility implements Ability
 	public Object onActivate(DPlayer dplayer, Object other)
 	{
 		// NULL check
-		if ( ! dplayer.isPlayer()) return Optional.empty();
+		if ( ! dplayer.isPlayer()) return null;
+		
 		return null;
 	}
 
