@@ -26,7 +26,7 @@ public class SmithingSkill extends DeriusSkill implements Skill
 		this.setIcon(Material.ANVIL);
 		
 		// Config
-		this.writeConfig("pvpExpModifier", 1.5);
+		this.writeConfig("repairQualityBreak", -5);
 		
 	}
 	
@@ -41,9 +41,9 @@ public class SmithingSkill extends DeriusSkill implements Skill
 	// CONFIG GETTERS
 	// -------------------------------------------- //
 	
-	public static double getPvpExpModifier()
+	public static int getRepairQualityBreak()
 	{
-		return get().readConfig("pvpExpModifier", Double.class);
+		return get().readConfig("repairQualityBreak", Integer.class);
 	}
 	
 }

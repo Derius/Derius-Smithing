@@ -96,9 +96,6 @@ public class Improving extends DeriusAbility implements Ability
 		
 		// Mark item as instable and pass it over into onDeactivate.
 		
-		
-		
-
 		return null;
 	}
 

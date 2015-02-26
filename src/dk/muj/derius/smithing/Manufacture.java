@@ -63,6 +63,17 @@ public class Manufacture extends DeriusAbility implements Ability
 		// NULL check
 		if ( ! dplayer.isPlayer()) return null;
 		
+		// -------------------------------------------- //
+		// Preparation and checks
+		// -------------------------------------------- //
+		
+		// Save players level in skill
+		
+		// Get all reciepts available till this level (for loop)
+		// and save them in a set
+		
+		// Get chance for successfull research by level and materials
+		
 		return null;
 	}
 
