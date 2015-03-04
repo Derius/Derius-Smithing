@@ -15,21 +15,31 @@ public class ItemDamageUtil
 {
 	public static String QUALITYLORE = Txt.parse("<i>Quality: ");
 	
+	// -------------------------------------------- //
+	// RepairQuality
+	// -------------------------------------------- //
+	
 	public static int getRepairQuality(ItemStack item)
 	{
 		Validate.notNull(item, "The item may not be null to get the repairquality.");
 		
 		List<String> loreList = item.getItemMeta().getLore();
+		String qualityLore = null;
 		
-		for (String lore : loreList)
+		// Get the qualityLore string
+		for (int x = 0; x < loreList.size(); x++)
 		{
+			String lore = loreList.get(x);
 			
+			if ( ! lore.startsWith(QUALITYLORE)) continue;
+			
+			qualityLore = lore;
+			break;
 		}
 		
-		String qualityLore = loreList.get(0);
+		// Getting the quality
 		int repairQuality;
-		
-		if ( ! qualityLore.startsWith(QUALITYLORE))
+		if ( qualityLore == null)
 		{
 			repairQuality = 0;
 			loreList.add(0, QUALITYLORE + repairQuality);
@@ -37,7 +47,7 @@ public class ItemDamageUtil
 		}
 		else
 		{
-			String stringNumber = (String) qualityLore.subSequence(QUALITYLORE.length(), qualityLore.length());
+			String stringNumber = qualityLore.substring(QUALITYLORE.length(), qualityLore.length());
 			repairQuality = Integer.parseInt(stringNumber);
 		}
 		
@@ -49,17 +59,34 @@ public class ItemDamageUtil
 		Validate.notNull(item, "The item may not be null to get the repairquality.");
 		
 		List<String> loreList = item.getItemMeta().getLore();
-		String qualityLore = loreList.get(0);
+		int position = 0;
 		
-		if (qualityLore.startsWith(QUALITYLORE))
+		// Get the qualityLore position
+		for (int x = 0; x < loreList.size(); x++)
 		{
-			loreList.remove(0);
+			String lore = loreList.get(x);
+			
+			if ( ! lore.startsWith(QUALITYLORE)) continue;
+			
+			// Are there more than one Quality lores? delete them
+			if (position != 0)
+			{
+				loreList.remove(position);
+				continue;
+			}
+				
+			position = x;
 		}
 		
-		loreList.add(0, QUALITYLORE + endQuality);
+		// Set the lore at correct position
+		loreList.set(position, QUALITYLORE + endQuality);
 		item.getItemMeta().setLore(loreList);
 	}
 
+	// -------------------------------------------- //
+	// repairType
+	// -------------------------------------------- //
+	
 	public static Material getRepairType(ItemStack item)
 	{
 		Validate.notNull(item, "The item may not be null.");
@@ -71,6 +98,10 @@ public class ItemDamageUtil
 		return null;
 	}
 
+	// -------------------------------------------- //
+	// OVERRIDE
+	// -------------------------------------------- //
+	
 	public static boolean willBreakNextRepair(ItemStack item)
 	{
 		Validate.notNull(item, "The item may not be null.");
@@ -106,9 +137,9 @@ public class ItemDamageUtil
 		
 	}
 
-	public static void reduceItemQuality(ItemStack item, int i, int level)
+	public static void reduceItemQuality(ItemStack item, int baseTake, int level)
 	{
-		
+		reducePercant
 	}
 
 }

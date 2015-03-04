@@ -140,7 +140,7 @@ public class Repair extends DeriusAbility implements Ability
 		}
 		
 		// How many scars are applied to the item?
-		ItemDamageUtil.reduceItemQuality(item, level);
+		ItemDamageUtil.reduceItemQuality(item, level, repairItemAmount);
 		
 		// How much durability is being restored?
 		short reduce = ItemDamageUtil.getReducedDamage(level, repairType);
