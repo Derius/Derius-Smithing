@@ -6,25 +6,25 @@ import dk.muj.derius.api.Skill;
 import dk.muj.derius.entity.ability.DeriusAbility;
 import dk.muj.derius.req.ReqHasEnoughStamina;
 
-public class Manufacture extends DeriusAbility implements Ability
+public class Craft extends DeriusAbility implements Ability
 {
-	private static Manufacture i = new Manufacture();
-	public static Manufacture get() { return i; }
+	private static Craft i = new Craft();
+	public static Craft get() { return i; }
 	
 	// -------------------------------------------- //
 	// CONTRUCT & DESCRIPTION
 	// -------------------------------------------- //
 	
-	public Manufacture()
+	public Craft()
 	{
 		// Ability properties
-		this.setName("Manufacture");
-		this.setDesc("Try out a new reciept.");
+		this.setName("Craft");
+		this.setDesc("Craft a new item with a reciept.");
 		this.setType(AbilityType.ACTIVE);
 		
 		// Exhaustion
-		this.setTicksCooldown(20*60*5);
 		this.setStaminaUsage(50.0);
+		this.setCooldownMillis(1000*5);
 		
 		// Requirements
 		this.addActivateRequirements(ReqHasEnoughStamina.get());

@@ -1,27 +1,25 @@
 package dk.muj.derius.smithing;
 
-import org.bukkit.inventory.ItemStack;
-
 import dk.muj.derius.api.Ability;
 import dk.muj.derius.api.DPlayer;
 import dk.muj.derius.api.Skill;
 import dk.muj.derius.entity.ability.DeriusAbility;
 import dk.muj.derius.req.ReqHasEnoughStamina;
 
-public class Improving extends DeriusAbility implements Ability
+public class Research extends DeriusAbility implements Ability
 {
-	private static Improving i = new Improving();
-	public static Improving get() { return i; }
+	private static Research i = new Research();
+	public static Research get() { return i; }
 	
 	// -------------------------------------------- //
 	// CONTRUCT & DESCRIPTION
 	// -------------------------------------------- //
 	
-	public Improving()
+	public Research()
 	{
 		// Ability properties
-		this.setName("Improve");
-		this.setDesc("Improve mundane crafts");
+		this.setName("Research");
+		this.setDesc("Research a new reciept.");
 		this.setType(AbilityType.ACTIVE);
 		
 		// Exhaustion
@@ -35,7 +33,7 @@ public class Improving extends DeriusAbility implements Ability
 	@Override
 	public String getLvlDescriptionMsg(int lvl)
 	{
-		// Add in description about how much chance there is for the item the be improved or not
+		// Add in description to how many reciepts could be found
 		return "";
 	}
 	
@@ -52,7 +50,7 @@ public class Improving extends DeriusAbility implements Ability
 	@Override
 	public String getId()
 	{
-		return "derius:smithing:improving";
+		return "derius:smithing:manufacture";
 	}
 
 	// -------------------------------------------- //
@@ -64,37 +62,28 @@ public class Improving extends DeriusAbility implements Ability
 	{
 		// NULL check
 		if ( ! dplayer.isPlayer()) return null;
-		ItemStack inHand = dplayer.getPlayer().getItemInHand();
-		if (inHand == null) return null;
 		
 		// -------------------------------------------- //
 		// Preparation and checks
 		// -------------------------------------------- //
 		
-		// How many Enchants does the item have?
-		//	Does it exceed the maximum amount (configurabel)?
+		// Save players level in skill
 		
-		// How broken is the tool? Including repair scars?
-		//	Can it still be improved (configurabel)?
-		//	Or should we let them go foreward and break it in the next step @Madus?
+		// Get all reciepts available till this level (for loop)
+		// and save them in a set
 		
-		// What is the Material class of the Item.
-		//	Can this material class be improved?
-		
-		// (Chance) Will the item be improved or demolished?
-		//	Take Level, material class and scars into consideration?
+		// Get chance for successfull research by level and materials
+		//	Is it succesfull? If yes, continue
 		
 		// -------------------------------------------- //
-		// Improve
+		// Get the reciept
 		// -------------------------------------------- //
 		
-		// Calculate the Level of the enchantment
+		// Get the phisical reciept/component
 		
-		// Calculate what enchant it will be (more or less random?)
+		// Store the reciept id to the dplayers list
 		
-		// Chance that enchantment disapers again after the ability has run out (so cruel.)
-		
-		// Mark item as instable and pass it over into onDeactivate.
+		// Msg the player that he now knows a new reciept
 		
 		return null;
 	}
@@ -102,6 +91,7 @@ public class Improving extends DeriusAbility implements Ability
 	@Override
 	public void onDeactivate(DPlayer dplayer, Object other)
 	{
-		// If chance lets it disapear, give exp and remove entchant
+		// TODO Auto-generated method stub
+
 	}
 }

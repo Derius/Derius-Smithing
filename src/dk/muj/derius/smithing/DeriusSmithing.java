@@ -22,7 +22,7 @@ public class DeriusSmithing extends MassivePlugin
 		if ( ! super.preEnable()) return;
 			
 		SmithingSkill.get().register();
-		Manufacture.get().register();
+		Craft.get().register();
 		Repair.get().register();
 		Improving.get().register();
 		
