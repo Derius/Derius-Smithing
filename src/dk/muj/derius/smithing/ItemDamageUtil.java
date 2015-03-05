@@ -1,6 +1,7 @@
 package dk.muj.derius.smithing;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
@@ -82,6 +83,19 @@ public class ItemDamageUtil
 		loreList.set(position, QUALITYLORE + endQuality);
 		item.getItemMeta().setLore(loreList);
 	}
+	
+	public static void reduceRepairQuality(ItemStack item, int baseTake, int level)
+	{
+		reduceRepairQuality(item, baseTake, level, getRepairQuality(item));
+	}
+	
+	public static void reduceRepairQuality(ItemStack item, int baseTake, int level, int currentQuality)
+	{
+		double reducePercant = Math.min(level / SmithingSkill.getReduceDamageInRepairPerLevel(), SmithingSkill.getReduceDamageInRepairPercentMax()) / 100;
+		int take = (int) Math.round(baseTake * (1.0 - reducePercant));
+		
+		setRepairQuality(item, currentQuality - take);
+	}
 
 	// -------------------------------------------- //
 	// repairType
@@ -91,15 +105,20 @@ public class ItemDamageUtil
 	{
 		Validate.notNull(item, "The item may not be null.");
 		
-		Material ret;
 		Material itemMaterial = item.getType();
+		Map<Material, Material> retMap = SmithingSkill.getMaterialToRepairType();
 		
-		// Talk with Madus about it
-		return null;
+		if ( ! retMap.containsKey(itemMaterial))
+		{
+			throw new IllegalArgumentException("DeriusSmithing does not currently provide a repairType for "
+				+ Txt.getNicedEnum(itemMaterial) + " nag the authors at https://github.com/Derius/Derius-Smithing/issues");
+		}
+		
+		return retMap.get(itemMaterial);
 	}
 
 	// -------------------------------------------- //
-	// OVERRIDE
+	// Booleans
 	// -------------------------------------------- //
 	
 	public static boolean willBreakNextRepair(ItemStack item)
@@ -135,11 +154,6 @@ public class ItemDamageUtil
 		
 		return SkillUtil.shouldDoubleDropOccur(levelAbove, (int) Math.round(SmithingSkill.getChancePerLevelAboveMin()));
 		
-	}
-
-	public static void reduceItemQuality(ItemStack item, int baseTake, int level)
-	{
-		reducePercant
 	}
 
 }

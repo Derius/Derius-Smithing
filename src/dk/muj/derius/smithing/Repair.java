@@ -106,7 +106,7 @@ public class Repair extends DeriusAbility implements Ability
 		if (ItemDamageUtil.willBreakNextRepair(quality))
 		{
 			ItemUtil.breakItem(item);
-			dplayer.msg("<b>The item was too weak and shattered into pieces.")
+			dplayer.msg("<b>The item was too weak and shattered into pieces.");
 			return null;
 		}
 		
@@ -120,7 +120,7 @@ public class Repair extends DeriusAbility implements Ability
 		if ( ! ItemDamageUtil.isRepairSuccessful(dplayer, type))
 		{
 			dplayer.msg("<b>You tried to repair the item, but failed.");
-			ItemDamageUtil.reduceItemQuality(item, 3, level);
+			ItemDamageUtil.reduceRepairQuality(item, 3, level, quality);
 			ItemUtil.applyDamage(item, (short)(50 * Math.random()));
 			return null;
 		}
@@ -140,14 +140,14 @@ public class Repair extends DeriusAbility implements Ability
 		}
 		
 		// How many scars are applied to the item?
-		ItemDamageUtil.reduceItemQuality(item, level, repairItemAmount);
+		ItemDamageUtil.reduceRepairQuality(item, level, repairItemAmount, quality);
 		
 		// How much durability is being restored?
 		short reduce = ItemDamageUtil.getReducedDamage(level, repairType);
 		boolean restored = ItemUtil.reduceDamage(item, reduce);
 		
 		// Send a Message, that the repair was successful
-		dplayer.msg("<g>The item was %s", restored ? "fully restored!" : Txt.parse("repaired by <lime>%s <g> points.", reduce));
+		dplayer.msg("<g>The item was %s", restored ? "fully restored!" : Txt.parse("repaired by <lime>%s <g> durability.", reduce));
 		
 		// Make a shiny particle or so on the Player.
 		player.playEffect(EntityEffect.VILLAGER_HAPPY);
