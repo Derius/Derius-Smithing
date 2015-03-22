@@ -9,8 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.massivecraft.massivecore.util.Txt;
 
-import dk.muj.derius.api.DPlayer;
-import dk.muj.derius.util.SkillUtil;
+import dk.muj.derius.api.player.DPlayer;
 
 public class ItemDamageUtil
 {
@@ -91,7 +90,9 @@ public class ItemDamageUtil
 	
 	public static void reduceRepairQuality(ItemStack item, int baseTake, int level, int currentQuality)
 	{
-		double reducePercant = Math.min(level / SmithingSkill.getReduceDamageInRepairPerLevel(), SmithingSkill.getReduceDamageInRepairPercentMax()) / 100;
+		level = level - SmithingSkill.getMinLevelToHandle(item.getType());
+		
+		double reducePercant = Math.min(level / SmithingSkill.getReduceQualityLossPercentPerLevel(), SmithingSkill.getReduceQualityLossPercentMax()) / 100;
 		int take = (int) Math.round(baseTake * (1.0 - reducePercant));
 		
 		setRepairQuality(item, currentQuality - take);
@@ -139,21 +140,9 @@ public class ItemDamageUtil
 		Validate.notNull(type, "The material may not be null.");
 		
 		int level = dplayer.getLvl(SmithingSkill.get());
-		int minLevel = SmithingSkill.getMinLevelToRepair(type);
+		int minLevel = SmithingSkill.getMinLevelToHandle(type);
 		
 		return level >= minLevel;
-	}
-
-	public static boolean isRepairSuccessful(DPlayer dplayer, Material type)
-	{
-		if ( ! dplayer.isPlayer()) throw new RuntimeException("dplayer must be a player");
-		Validate.notNull(type, "The material may not be null.");
-		
-		int level = dplayer.getLvl(SmithingSkill.get());
-		int levelAbove = level - SmithingSkill.getMinLevelToRepair(type);
-		
-		return SkillUtil.shouldDoubleDropOccur(levelAbove, (int) Math.round(SmithingSkill.getChancePerLevelAboveMin()));
-		
 	}
 
 }

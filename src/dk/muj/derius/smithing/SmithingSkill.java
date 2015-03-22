@@ -3,14 +3,14 @@ package dk.muj.derius.smithing;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.plugin.Plugin;
 
 import com.massivecraft.massivecore.util.MUtil;
 import com.massivecraft.massivecore.xlib.gson.reflect.TypeToken;
 
-import dk.muj.derius.api.Skill;
-import dk.muj.derius.entity.skill.DeriusSkill;
+import dk.muj.derius.api.skill.SkillAbstract;
 
-public class SmithingSkill extends DeriusSkill implements Skill
+public class SmithingSkill extends SkillAbstract
 {
 	// -------------------------------------------- //
 	// INSTANCE & CONSTRUCT
@@ -26,26 +26,28 @@ public class SmithingSkill extends DeriusSkill implements Skill
 		
 		this.setDesc("Learns you how to.");
 		
-		this.addEarnExpDescs("Craft, repair or improve Armour and Items.");
+		this.addEarnExpDescs("Craft, repair or improve Armor and Items.");
 		
 		this.setIcon(Material.ANVIL);
 		
 		// Config
-		this.writeConfig("repairQualityBreak", -5);
-		this.writeConfig("chancePerLevelAboveMin", 5.0);
-		this.writeConfig("reduceDamageInRepairPerLevel", 0.01);
-		this.writeConfig("reduceDamageInRepairPercentMax", 33.33);
+		this.writeConfig(Const.JSON_REPAIR_QUALITY_BREAK, -5);
+		this.writeConfig(Const.JSON_REPAIR_DAMAGE_LEVELS_PER_PERCENT, 50);
+
+		this.writeConfig(Const.JSON_REDUCE_QUALITY_LOSS_PERCENT_PER_LEVELS, 0.01);
+		this.writeConfig(Const.JSON_REDUCE_QUALITY_LOSS_PERCENT_MAX, 33.33);
 		
-		this.writeConfig("minLevelToRepair", MUtil.map(
-				Material.LEATHER, 20,
-				Material.WOOD, 40,
-				Material.IRON_FENCE, 30,
-				Material.IRON_INGOT, 10,
-				Material.GOLD_INGOT, 20,
-				Material.DIAMOND, 40
+		this.writeConfig(Const.JSON_MIN_LEVEL_TO_HANDLE, MUtil.map(
+				Material.LEATHER, 0,
+				Material.WOOD, 0,
+				Material.IRON_FENCE, 100,
+				Material.IRON_INGOT, 300,
+				Material.GOLD_INGOT, 400,
+				Material.DIAMOND, 500
 				), new TypeToken<Map<Material, Integer>>(){});
 		
-		this.writeConfig("materialToRepairType", MUtil.map(
+		this.writeConfig(Const.JSON_MATERIAL_TO_REPAIRYPE, MUtil.map(
+				
 				// Leather Items				
 				Material.LEATHER_HELMET,		Material.LEATHER,
 				Material.LEATHER_CHESTPLATE,	Material.LEATHER,
@@ -113,6 +115,14 @@ public class SmithingSkill extends DeriusSkill implements Skill
 				Material.BOW,					Material.STRING
 				), new TypeToken<Map<Material, Material>>(){});
 				
+		this.writeConfig(Const.JSON_EXP_GAIN, MUtil.map(
+				Material.LEATHER, 10.0,
+				Material.WOOD, 10.0,
+				Material.IRON_FENCE, 20.0,
+				Material.IRON_INGOT, 30.0,
+				Material.GOLD_INGOT, 40.0,
+				Material.DIAMOND, 50.0
+				), new TypeToken<Map<Material, Double>>(){});
 	}
 	
 	@Override
@@ -122,39 +132,48 @@ public class SmithingSkill extends DeriusSkill implements Skill
 		
 	}
 	
+	@Override
+	public Plugin getPlugin()
+	{
+		return DeriusSmithing.get();
+	}
+
 	// -------------------------------------------- //
 	// CONFIG GETTERS
 	// -------------------------------------------- //
 	
 	public static int getRepairQualityBreak()
 	{
-		return get().readConfig("repairQualityBreak", Integer.class);
+		return get().readConfig(Const.JSON_REPAIR_QUALITY_BREAK, Integer.class);
 	}
 	
-	public static int getMinLevelToRepair(Material material)
+	public static int getMinLevelToHandle(Material material)
 	{
-		return get().readConfig("minLevelToRepair", new TypeToken<Map<Material, Integer>>(){}).get(material);
+		return get().readConfig(Const.JSON_MIN_LEVEL_TO_HANDLE, new TypeToken<Map<Material, Integer>>(){}).get(material);
 	}
 	
 	public static Map<Material, Material> getMaterialToRepairType()
 	{
-		return get().readConfig("materialToRepairType", new TypeToken<Map<Material, Material>>(){});
+		return get().readConfig(Const.JSON_MATERIAL_TO_REPAIRYPE, new TypeToken<Map<Material, Material>>(){});
 	}
 	
-	public static double getChancePerLevelAboveMin()
+	public static double getReduceQualityLossPercentPerLevel()
 	{
-		return get().readConfig("chancePerLevelAboveMin", Double.class);
+		return get().readConfig(Const.JSON_REDUCE_QUALITY_LOSS_PERCENT_PER_LEVELS, Double.class);
 	}
 
-	public static double getReduceDamageInRepairPerLevel()
+	public static double getReduceQualityLossPercentMax()
 	{
-		return get().readConfig("reduceDamageInRepairPerLevel", Double.class);
+		return get().readConfig(Const.JSON_REDUCE_QUALITY_LOSS_PERCENT_MAX, Double.class);
 	}
 
-	public static double getReduceDamageInRepairPercentMax()
+	public static int getRepairDamagePercentPerLevels()
 	{
-		return get().readConfig("reduceDamageInRepairPercentMax", Double.class);
+		return get().readConfig(Const.JSON_REPAIR_DAMAGE_LEVELS_PER_PERCENT, Integer.class);
 	}
 	
-	
+	public static Map<Material, Double> getExpGain()
+	{
+		return get().readConfig(Const.JSON_EXP_GAIN, new TypeToken<Map<Material, Double>>(){});
+	}
 }

@@ -1,22 +1,26 @@
 package dk.muj.derius.smithing;
 
-import org.bukkit.Effect;
+import java.util.Optional;
+
 import org.bukkit.EntityEffect;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.massivecraft.massivecore.Couple;
+import com.massivecraft.massivecore.util.InventoryUtil;
 import com.massivecraft.massivecore.util.Txt;
 
-import dk.muj.derius.api.Ability;
-import dk.muj.derius.api.DPlayer;
-import dk.muj.derius.api.Skill;
-import dk.muj.derius.entity.ability.DeriusAbility;
+import dk.muj.derius.api.VerboseLevel;
+import dk.muj.derius.api.ability.AbilityAbstract;
+import dk.muj.derius.api.player.DPlayer;
+import dk.muj.derius.api.req.ReqHasEnoughStamina;
+import dk.muj.derius.api.skill.Skill;
+import dk.muj.derius.api.util.SkillUtil;
 import dk.muj.derius.lib.ItemUtil;
-import dk.muj.derius.req.ReqHasEnoughStamina;
 
-public class Repair extends DeriusAbility implements Ability
+public class Repair extends AbilityAbstract<ItemStack>
 {
 	private static Repair i = new Repair();
 	public static Repair get() { return i; }
@@ -25,7 +29,7 @@ public class Repair extends DeriusAbility implements Ability
 	// CONTRUCT & DESCRIPTION
 	// -------------------------------------------- //
 	
-	public Repair()
+	private Repair()
 	{
 		// Ability properties
 		this.setName("Repair");
@@ -41,10 +45,9 @@ public class Repair extends DeriusAbility implements Ability
 	}
 	
 	@Override
-	public String getLvlDescriptionMsg(int lvl)
+	public Optional<String> getLvlDescriptionMsg(int lvl)
 	{
-		// Add in description about how much chance there is for the item the be repaired a bit
-		return "";
+		return Optional.of("<i>There is a <h>" + String.valueOf(getPercent(lvl)) + "% <i>chance to repair a basic item./nThis starts at zero for every new item class you are able to repair.");
 	}
 	
 	// -------------------------------------------- //
@@ -68,30 +71,27 @@ public class Repair extends DeriusAbility implements Ability
 	// -------------------------------------------- //
 	
 	@Override
-	public Object onActivate(DPlayer dplayer, Object other)
+	public Object onActivate(DPlayer dplayer, ItemStack item)
 	{
 		// NULL check
 		if ( ! dplayer.isPlayer()) return null;
-		ItemStack item = dplayer.getPlayer().getItemInHand();
 		if (item == null) return null;
 		
 		// -------------------------------------------- //
 		// Preparation and checks
 		// -------------------------------------------- //
 		
+		Skill skill = getSkill();
+		
 		// Store data about the item
-		int durabilityLeft = ItemUtil.durabilityLeft(item);
 		int quality = ItemDamageUtil.getRepairQuality(item);
 		Material type = item.getType();
 		
 		// Store data about the player
-		int level = dplayer.getLvl(getSkill());
+		int level = dplayer.getLvl(skill);
 		Player player = dplayer.getPlayer();
 		
-		// What Material class (iron, gold, ect) is the tool?
-		//	Thus, what material is used to repair it (configurable)?
-		//	How many repair Materials in inventory? Atleast one?
-		
+		// What is the material to repair this item with?
 		Material repairType = ItemDamageUtil.getRepairType(item);
 		Inventory playerInventory = player.getInventory();
 		boolean hasRepairType = playerInventory.contains(repairType);
@@ -117,7 +117,8 @@ public class Repair extends DeriusAbility implements Ability
 			return null;
 		}
 		
-		if ( ! ItemDamageUtil.isRepairSuccessful(dplayer, type))
+		// Is the repair successful?
+		if ( ! this.isRepairSuccessful(level, type))
 		{
 			dplayer.msg("<b>You tried to repair the item, but failed.");
 			ItemDamageUtil.reduceRepairQuality(item, 3, level, quality);
@@ -130,34 +131,56 @@ public class Repair extends DeriusAbility implements Ability
 		// -------------------------------------------- //
 		
 		// How many repairItems does the player have?
-		int repairItemAmount;
-		for(ItemStack stack : playerInventory.getContents())
-		{
-			if (stack.getType() == repairType)
-			{
-				repairItemAmount += stack.getAmount();
-			}
-		}
+		int repairItemAmount = InventoryUtil.countSimilar(playerInventory, new ItemStack(repairType));
 		
-		// How many scars are applied to the item?
+		// For how much is the quality lessend?
 		ItemDamageUtil.reduceRepairQuality(item, level, repairItemAmount, quality);
 		
 		// How much durability is being restored?
-		short reduce = ItemDamageUtil.getReducedDamage(level, repairType);
-		boolean restored = ItemUtil.reduceDamage(item, reduce);
+		short reduce = this.getReducedDamage(level, item, repairType);
+		Couple<ItemStack, Boolean> restore = ItemUtil.reduceDamage(item, reduce);
 		
 		// Send a Message, that the repair was successful
-		dplayer.msg("<g>The item was %s", restored ? "fully restored!" : Txt.parse("repaired by <lime>%s <g> durability.", reduce));
+		dplayer.msg("<g>The item was %s", restore.getValue() ? "fully restored!" : Txt.parse("repaired by <lime>%s <g> durability.", reduce));
 		
 		// Make a shiny particle or so on the Player.
 		player.playEffect(EntityEffect.VILLAGER_HAPPY);
+		
+		// Give exp for the item class
+		if (SkillUtil.canPlayerLearnSkill(dplayer, skill, VerboseLevel.HIGHEST))
+		{
+			dplayer.addExp(skill, SmithingSkill.getExpGain().get(repairType));
+		}
 		
 		return null;
 	}
 
 	@Override
-	public void onDeactivate(DPlayer dplayer, Object other)
+	public void onDeactivate(DPlayer dplayer, Object other) {}
+	
+	// -------------------------------------------- //
+	// PRIVATES
+	// -------------------------------------------- //
+	
+	private boolean isRepairSuccessful(int level, Material type)
 	{
-		// There will be none probably
+		if (type != null)
+		{
+			level = level - SmithingSkill.getMinLevelToHandle(type);
+		}
+		
+		return SkillUtil.shouldRandomOccure(level, SmithingSkill.getRepairDamagePercentPerLevels());
+	}
+	
+	private short getReducedDamage(int level, ItemStack item, Material repairType)
+	{
+		short durabilityLeft = (short) (ItemUtil.maxDurability(item) - item.getDurability());
+		
+		return (short) (this.getPercent(level) * durabilityLeft);
+	}
+	
+	private double getPercent(int level)
+	{
+		return level / SmithingSkill.getRepairDamagePercentPerLevels();
 	}
 }

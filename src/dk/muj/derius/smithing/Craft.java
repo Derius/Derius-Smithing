@@ -1,12 +1,15 @@
 package dk.muj.derius.smithing;
 
-import dk.muj.derius.api.Ability;
-import dk.muj.derius.api.DPlayer;
-import dk.muj.derius.api.Skill;
-import dk.muj.derius.entity.ability.DeriusAbility;
-import dk.muj.derius.req.ReqHasEnoughStamina;
+import java.util.Optional;
 
-public class Craft extends DeriusAbility implements Ability
+import org.bukkit.inventory.ItemStack;
+
+import dk.muj.derius.api.ability.AbilityAbstract;
+import dk.muj.derius.api.player.DPlayer;
+import dk.muj.derius.api.req.ReqHasEnoughStamina;
+import dk.muj.derius.api.skill.Skill;
+
+public class Craft extends AbilityAbstract<ItemStack>
 {
 	private static Craft i = new Craft();
 	public static Craft get() { return i; }
@@ -31,10 +34,10 @@ public class Craft extends DeriusAbility implements Ability
 	}
 	
 	@Override
-	public String getLvlDescriptionMsg(int lvl)
+	public Optional<String> getLvlDescriptionMsg(int lvl)
 	{
 		// Add in description to how many reciepts could be found
-		return "";
+		return Optional.of("");
 	}
 	
 	// -------------------------------------------- //
@@ -50,7 +53,7 @@ public class Craft extends DeriusAbility implements Ability
 	@Override
 	public String getId()
 	{
-		return "derius:smithing:manufacture";
+		return "derius:smithing:craft";
 	}
 
 	// -------------------------------------------- //
@@ -58,7 +61,7 @@ public class Craft extends DeriusAbility implements Ability
 	// -------------------------------------------- //
 	
 	@Override
-	public Object onActivate(DPlayer dplayer, Object other)
+	public Object onActivate(DPlayer dplayer, ItemStack item)
 	{
 		// NULL check
 		if ( ! dplayer.isPlayer()) return null;
