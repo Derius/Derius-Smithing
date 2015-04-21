@@ -1,14 +1,19 @@
 package dk.muj.derius.smithing;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import com.massivecraft.massivecore.util.MUtil;
+import com.massivecraft.massivecore.util.Txt;
 
 import dk.muj.derius.api.ability.AbilityAbstract;
 import dk.muj.derius.api.player.DPlayer;
 import dk.muj.derius.api.req.ReqHasEnoughStamina;
 import dk.muj.derius.api.skill.Skill;
+import dk.muj.derius.smithing.reciepts.Recipe;
 
 public class Research extends AbilityAbstract<ItemStack>
 {
@@ -37,8 +42,9 @@ public class Research extends AbilityAbstract<ItemStack>
 	@Override
 	public Optional<String> getLvlDescriptionMsg(int lvl)
 	{
+		int size = this.getRecieptsAvailableTill(lvl).size();
 		// Add in description to how many receipts could be found
-		return Optional.of("");
+		return Optional.of(Txt.parse("<i>You can find %s recipes and have a %s% chance in succeeding.", String.valueOf(size), "percantage"));
 	}
 	
 	// -------------------------------------------- //
@@ -80,13 +86,13 @@ public class Research extends AbilityAbstract<ItemStack>
 		
 		// Get all receipts available till this level (for loop)
 		// and save them in a set
-		Set<Receipts> receipts = ReceiptUtil.getRecieptsAvailableTill(level);
+		Set<Recipe> recipes = this.getRecieptsAvailableTill(level);
 		
-		// Get chance for successfull research by level and materials
+		// Get chance for successful research by level and materials
 		//	Is it successful? If yes, continue
 		if ( ! this.isResearchSuccessful(level))
 		{
-			ReceiptUtil.removeResearchItems();
+			this.removeResearchItems();
 			dplayer.msg("<b>You were not successful researching the receipt and lost your items being used.");
 			return null;
 		}
@@ -95,19 +101,55 @@ public class Research extends AbilityAbstract<ItemStack>
 		// Get the reciept
 		// -------------------------------------------- //
 		
-		// Get the phisical reciept/component
-		ReceiptUtil.getRandomReciept(receipts);
 		
-		// Store the reciept id to the dplayers list
+		Recipe recipe = MUtil.random(recipes);
+		ItemStack core = recipe.getCore();
 		
-		// Msg the player that he now knows a new reciept
+		// Store the recipe id to the dplayers list
+		recipe.storeFor(dplayer);
+		
+		// Hand out physical core-part
+		player.getInventory().addItem(core);
+		
+		// Inform
+		if ( ! recipe.isKnownto(dplayer))
+		{
+			dplayer.msg("<g>You now know the reciept %s!", recipe.getName());
+		}
+		else
+		{
+			dplayer.msg("<b>You researched a receipt that you were already aware of!");
+			dplayer.msg("<i>The item-core might still be usefull for you though.");
+		}
+		
+		this.removeResearchItems();
 		
 		return null;
 	}
 
 	@Override
-	public void onDeactivate(DPlayer dplayer, Object other)
+	public void onDeactivate(DPlayer dplayer, Object other) { }
+	
+	// -------------------------------------------- //
+	// UTIL
+	// -------------------------------------------- //
+	
+	private boolean isResearchSuccessful(int level)
 	{
 		// TODO Auto-generated method stub
+		return false;
 	}
+	
+	private void removeResearchItems()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private Set<Recipe> getRecieptsAvailableTill(int level)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

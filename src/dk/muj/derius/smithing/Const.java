@@ -17,5 +17,6 @@ public class Const
 	public static final String JSON_MIN_LEVEL_TO_HANDLE = "min level to handle";
 	public static final String JSON_MATERIAL_TO_REPAIRYPE = "material to repairtype";
 	public static final String JSON_REPAIR_DAMAGE_LEVELS_PER_PERCENT = "Repair damage levels per percent chance";
+	public static final String RECIPE_COLLECTION = "Recipe collection";
 	
 }
